@@ -1,0 +1,9 @@
+ ,EN,FR,DE,IT,PT,AR,RU,ES,JA,ZH
+main.title,How much snow do Swiss ski resorts have on Christmas day?,,,,,,,,,
+descr,"The beige line is the smooth average of the snow coverage on Christmas days over time (red dots denote years where there was no snow on the 25th of December, grey dots indicate missing data). ",,,,,,,,,
+ylab,snow depth (cm),,,,,,,,,
+m.abb,m,,,,,,,,,
+source,Source,source,Quelle,Fonte,fonte,المصدر,Источник,Fuente,出典,来源
+source.name,MétéoSuisse,,,,,,,,,
+title.font,OpenSans-CondensedBold,OpenSans-CondensedBold,OpenSans-CondensedBold,OpenSans-CondensedBold,OpenSans-CondensedBold,OpenSans-CondensedBold,OpenSans-CondensedBold,OpenSans-CondensedBold,PingFang TC Regular,PingFang TC Regular
+base.font,Open Sans Condensed,Open Sans Condensed,Open Sans Condensed,Open Sans Condensed,Open Sans Condensed,Open Sans Condensed,Open Sans Condensed,Open Sans Condensed,PingFang TC Thin,PingFang TC Thin
