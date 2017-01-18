@@ -130,11 +130,11 @@ $(document).ready(function () {
 
 <div id="ggiraph-svg-font-import" class="section level2">
 <h2>ggiraph / SVG / font import</h2>
-<p>The interactive graphic with ggiraph under will have the font correctly imported. However, trying to display the non-interactive chart (ggplot2 non interactive) will throw an error because the font does not exist!!!**</p>
+<p><strong>The interactive graphic with ggiraph under will have the font correctly imported. However, trying to display the non-interactive chart (ggplot2 non interactive) will throw an error because the font does not exist!!!</strong></p>
 <pre class="r"><code>txt &lt;- loadTranslation(translation.file)</code></pre>
-<pre><code>## Warning in loadTranslation(translation.file): FR DE  IT  PT  AR  RU  ES  JA  ZH languages will be discarded!</code></pre>
+<pre><code>## Warning in loadTranslation(translation.file): JA languages will be discarded!</code></pre>
 <pre><code>## 
-##  Remaining column names:  EN</code></pre>
+##  Remaining column names:  EN FR DE IT PT RU ES ZH AR</code></pre>
 <pre class="r"><code>station &lt;- data.frame(
   id = c(41, 1, 63, 69),
   name = c('Zermatt', 'Arosa', 'Adelboden', 'Engelberg'),
@@ -166,93 +166,85 @@ data.read$date &lt;- as.Date(paste0(data.read$JAHR, &quot;-&quot;, data.read$MO,
 data &lt;- data.read %&gt;% select(-HH, -MM)
 
 # cleaning
-data[which(data$snow == 32767), 'snow'] &lt;- NA
-
-# data$moda &lt;- paste0(data$MO, &quot;.&quot;, data$TG)
-# data$startYear &lt;- as.Date(paste0(data.read$JAHR, &quot;-&quot;, 1, &quot;-&quot;, 1 ))
-# data$moda &lt;- as.numeric(data$date - data$startYear)</code></pre>
+data[which(data$snow == 32767), 'snow'] &lt;- NA</code></pre>
 <pre class="r"><code>lang &lt;- 'EN'
 
+for(lang in colnames(txt)) {
 
-
-dd &lt;- data %&gt;% filter(MO == 12, TG == 25, JAHR != 2016)
-dd$alt &lt;- paste0(station[match(dd$STA, station$name), 'alt'], txt['m.abb', lang])
-
-# create data.frame for xmas without snow
-ddd &lt;- dd %&gt;% filter(snow == 0 | is.na(snow)) %&gt;%
-  select(STA, JAHR, snow)
-# ddd$xend &lt;- ddd$JAHR  + 0.4
-# ddd$xstart &lt;- ddd$JAHR -0.4
-# ddd$ystart &lt;- -6
-# ddd$yend &lt;- 0
-ddd$y &lt;- -2.5
-
-ddl &lt;- dd[!duplicated(dd$STA),]
-ddl$tooltip &lt;- paste0(
-  '&lt;img src=&quot;', as.character(station[match(ddl$STA, station$name), 'pic_url']), '&quot; alt=&quot;', as.character(ddl$STA), '&quot; style=&quot;width:157px;&quot;&gt;')
-
-ddl$onclick &lt;- paste0(
-  'window.open(&quot;', as.character(station[match(ddl$STA, station$name), 'link']), '&quot;)'
-)
-
-wc.pc &lt;- dd %&gt;% group_by(STA) %&gt;% summarise(wc = sum(snow &gt; 0, na.rm = T) / sum(!is.na(snow))) %&gt;% ungroup()
-ddl$wc &lt;- round(wc.pc[match(ddl$STA, wc.pc$STA), 'wc'] * 100, 1)
-
-
-ddl$wc.lab &lt;- paste0(txt['pc.wc', lang], &quot;: &quot;, unlist(ddl$wc))
+  dd &lt;- data %&gt;% filter(MO == 12, TG == 25, JAHR != 2016)
+  dd$alt &lt;- paste0(station[match(dd$STA, station$name), 'alt'], txt['m.abb', lang])
   
-gp &lt;- ggplot(data = dd, aes(JAHR, snow)) + 
-  geom_bar_interactive(aes(fill = STA, data_id = interaction(JAHR, STA)), stat = &quot;identity&quot;) + 
-  geom_text_interactive(
-    data = ddl, 
-    aes(label = STA, tooltip = tooltip, data_id = STA, onclick = onclick), 
-    x = 1992, y = 107, hjust = 0.5, vjust = 0, 
-    colour = &quot;#f7f5ed&quot;, family = &quot;Open Sans Condensed&quot;, 
-    size = 8, alpha = 0.9
-  ) +
-  geom_text(data = ddl, aes(label = alt), x = 2003, y = 107, hjust = 0, vjust = 0, 
-            colour = &quot;#f7f5ed&quot;, family = &quot;Open Sans Condensed&quot;, size = 4, alpha = 0.3) +
-  geom_smooth(se = F, colour = &quot;#aa8959&quot;, alpha = 0.35) + 
-  facet_wrap( ~ STA, ncol = 2) + 
-  geom_point(
-    data = ddd %&gt;% filter(snow == 0), aes(x = JAHR, y = y),  colour='#ab3d3f'
-  ) +
-   geom_point(
-    data = ddd %&gt;% filter(is.na(snow)), aes(x = JAHR, y = y),  colour='#808080'
-  ) + 
-  swi_theme(base_size = 11, base_color = &quot;#f2f2f2&quot;, base_family = &quot;Open Sans Condensed&quot;) + 
-  scale_x_continuous(
-    name = &quot;&quot;, breaks = scales::pretty_breaks(n = 6), 
-    expand = c(0,0), position = &quot;top&quot;) + 
-  scale_y_continuous(name = txt['ylab', lang], expand = c(0,0), limits = c(-5, max(dd$snow, na.rm = T))) +
-  scale_fill_manual(values = swi_pal) + 
-  theme(
-    legend.position = &quot;none&quot;, 
-    plot.background = element_rect(fill = &quot;#333333&quot;, size = 0, color = NA),
-    panel.grid.major.y=element_line(color=&quot;#737373&quot;, linetype=&quot;dotted&quot;, size=0.09),
-    axis.title = element_text(colour = &quot;#f7f5ed&quot;, size = 15),
-    axis.text = element_text(colour = &quot;#e5dbcd&quot;),
-    strip.background = element_blank(),
-    strip.text = element_blank(),
-    plot.margin=unit(c(0, 0.1, 0, 0.1), &quot;cm&quot;)) </code></pre>
-<pre><code>## Warning: Ignoring unknown aesthetics: data_id</code></pre>
-<pre><code>## Warning: Ignoring unknown aesthetics: tooltip, data_id, onclick</code></pre>
-<pre class="r"><code>igp &lt;- ggiraph(
-  width = 1,
-  height_svg = 7,
-  code = {print(gp)}, 
-  hover_css = &quot;fill:#FF4C3B;cursor:pointer;&quot;,
-  tooltip_offx = -120,
-  tooltip_offy = 13,
-  fonts = list(sans = &quot;Open Sans Condensed&quot;)
-  )</code></pre>
-<pre><code>## Warning: package 'gdtools' was built under R version 3.3.2</code></pre>
-<pre><code>## `geom_smooth()` using method = 'loess'</code></pre>
-<pre><code>## Warning: Removed 6 rows containing non-finite values (stat_smooth).</code></pre>
-<pre><code>## Warning: Removed 6 rows containing missing values (position_stack).</code></pre>
-<pre class="r"><code>source &lt;- paste0(txt['source', lang], &quot;: &quot;, txt['source.name', lang], &quot; | swissinfo.ch&quot;)
+  # create data.frame for xmas without snow
+  ddd &lt;- dd %&gt;% filter(snow == 0 | is.na(snow)) %&gt;%
+    select(STA, JAHR, snow)
+  ddd$y &lt;- -2.5
   
- outfile &lt;- paste0(&quot;xmas_snow_&quot;, lang, &quot;.html&quot;)
+  ddl &lt;- dd[!duplicated(dd$STA),]
+  ddl$label &lt;- txt[as.character(ddl$STA), lang]
+  
+  ddl$tooltip &lt;- paste0(
+    '&lt;img src=&quot;', as.character(station[match(ddl$STA, station$name), 'pic_url']), '&quot; alt=&quot;', as.character(ddl$STA), '&quot; style=&quot;width:157px;&quot;&gt;')
+  
+  ddl$onclick &lt;- paste0(
+    'window.open(&quot;', as.character(station[match(ddl$STA, station$name), 'link']), '&quot;)'
+  )
+  
+  wc.pc &lt;- dd %&gt;% group_by(STA) %&gt;% summarise(wc = sum(snow &gt; 0, na.rm = T) / sum(!is.na(snow))) %&gt;% ungroup()
+  ddl$wc &lt;- round(wc.pc[match(ddl$STA, wc.pc$STA), 'wc'] * 100, 1)
+  
+  ddl$wc.lab &lt;- paste0(txt['pc.wc', lang], &quot;: &quot;, unlist(ddl$wc))
+  
+  gp &lt;- ggplot(data = dd, aes(JAHR, snow)) + 
+    geom_bar_interactive(aes(fill = STA, data_id = interaction(JAHR, STA)), stat = &quot;identity&quot;) + 
+    geom_text_interactive(
+      data = ddl, 
+      aes(label = label, tooltip = tooltip, data_id = STA, onclick = onclick), 
+      x = 1992, y = 107, hjust = ifelse(lang == 'AR', 0.1, 1), vjust = 0, 
+      colour = &quot;#f7f5ed&quot;, family = &quot;Open Sans Condensed&quot;, 
+      size = as.numeric(txt['sta.fontsize', lang]), alpha = 0.9
+    ) +
+    geom_text(data = ddl, aes(label = alt), x = 2003, y = 107, hjust = 0, vjust = 0, 
+              colour = &quot;#f7f5ed&quot;, family = &quot;Open Sans Condensed&quot;, size = as.numeric(txt['sta.fontsize', lang]) / 2, alpha = 0.5) +
+    geom_smooth(se = F, colour = &quot;#aa8959&quot;, alpha = 0.35) + 
+    facet_wrap( ~ STA, ncol = 2) + 
+    geom_point(
+      data = ddd %&gt;% filter(snow == 0), aes(x = JAHR, y = y),  colour='#ab3d3f'
+    ) +
+    geom_point(
+      data = ddd %&gt;% filter(is.na(snow)), aes(x = JAHR, y = y),  colour='#808080'
+    ) + 
+    swi_theme(base_size = 11, base_color = &quot;#f2f2f2&quot;, base_family = &quot;Open Sans Condensed&quot;) + 
+    scale_x_continuous(
+      name = &quot;&quot;, breaks = scales::pretty_breaks(n = 6), 
+      expand = c(0,0), position = &quot;top&quot;) + 
+    scale_y_continuous(name = txt['ylab', lang], expand = c(0,0), limits = c(-5, max(dd$snow, na.rm = T))) +
+    scale_fill_manual(values = swi_pal) + 
+    theme(
+      legend.position = &quot;none&quot;, 
+      plot.background = element_rect(fill = &quot;#333333&quot;, size = 0, color = NA),
+      panel.grid.major.y=element_line(color=&quot;#737373&quot;, linetype=&quot;dotted&quot;, size=0.09),
+      axis.title = element_text(colour = &quot;#f7f5ed&quot;, size = 15),
+      axis.text = element_text(colour = &quot;#e5dbcd&quot;),
+      strip.background = element_blank(),
+      strip.text = element_blank(),
+      plot.margin=unit(c(0, 0.1, 0, 0.1), &quot;cm&quot;)) 
+  
+  igp &lt;- ggiraph(
+    width = 1,
+    height_svg = 6.6,
+    code = {print(gp)}, 
+    hover_css = &quot;fill:#FF4C3B;cursor:pointer;&quot;,
+    tooltip_offx = -120,
+    tooltip_offy = 13,
+    fonts = list(sans = &quot;Open Sans Condensed&quot;)
+  )
+  
+  source &lt;- paste0(
+    txt['source', lang], &quot;: &quot;, 
+    htmlLink(txt['source.url', lang], txt['source.name', lang]), 
+    &quot; | &quot;, htmlLink(&quot;http://www.swissinfo.ch&quot;, 'swissinfo.ch')  )
+  
+  outfile &lt;- paste0(&quot;xmas_snow_&quot;, lang, &quot;.html&quot;)
   save_html(
     tags$html(
       tags$head(includeHTML(&quot;styles.html&quot;)),
@@ -263,7 +255,54 @@ gp &lt;- ggplot(data = dd, aes(JAHR, snow)) +
         div(id = &quot;cite&quot;, HTML(source)),
         HTML(iframeresizer)  
       )), file = outfile, libdir = &quot;js&quot;, background = &quot;#333333&quot;
-  )</code></pre>
+  )  
+}</code></pre>
+<pre><code>## Warning: Ignoring unknown aesthetics: data_id</code></pre>
+<pre><code>## Warning: Ignoring unknown aesthetics: tooltip, data_id, onclick</code></pre>
+<pre><code>## Warning: package 'gdtools' was built under R version 3.3.2</code></pre>
+<pre><code>## `geom_smooth()` using method = 'loess'</code></pre>
+<pre><code>## Warning: Removed 6 rows containing non-finite values (stat_smooth).</code></pre>
+<pre><code>## Warning: Removed 6 rows containing missing values (position_stack).</code></pre>
+<pre><code>## Warning: Ignoring unknown aesthetics: data_id</code></pre>
+<pre><code>## Warning: Ignoring unknown aesthetics: tooltip, data_id, onclick</code></pre>
+<pre><code>## `geom_smooth()` using method = 'loess'</code></pre>
+<pre><code>## Warning: Removed 6 rows containing non-finite values (stat_smooth).</code></pre>
+<pre><code>## Warning: Removed 6 rows containing missing values (position_stack).</code></pre>
+<pre><code>## Warning: Ignoring unknown aesthetics: data_id</code></pre>
+<pre><code>## Warning: Ignoring unknown aesthetics: tooltip, data_id, onclick</code></pre>
+<pre><code>## `geom_smooth()` using method = 'loess'</code></pre>
+<pre><code>## Warning: Removed 6 rows containing non-finite values (stat_smooth).</code></pre>
+<pre><code>## Warning: Removed 6 rows containing missing values (position_stack).</code></pre>
+<pre><code>## Warning: Ignoring unknown aesthetics: data_id</code></pre>
+<pre><code>## Warning: Ignoring unknown aesthetics: tooltip, data_id, onclick</code></pre>
+<pre><code>## `geom_smooth()` using method = 'loess'</code></pre>
+<pre><code>## Warning: Removed 6 rows containing non-finite values (stat_smooth).</code></pre>
+<pre><code>## Warning: Removed 6 rows containing missing values (position_stack).</code></pre>
+<pre><code>## Warning: Ignoring unknown aesthetics: data_id</code></pre>
+<pre><code>## Warning: Ignoring unknown aesthetics: tooltip, data_id, onclick</code></pre>
+<pre><code>## `geom_smooth()` using method = 'loess'</code></pre>
+<pre><code>## Warning: Removed 6 rows containing non-finite values (stat_smooth).</code></pre>
+<pre><code>## Warning: Removed 6 rows containing missing values (position_stack).</code></pre>
+<pre><code>## Warning: Ignoring unknown aesthetics: data_id</code></pre>
+<pre><code>## Warning: Ignoring unknown aesthetics: tooltip, data_id, onclick</code></pre>
+<pre><code>## `geom_smooth()` using method = 'loess'</code></pre>
+<pre><code>## Warning: Removed 6 rows containing non-finite values (stat_smooth).</code></pre>
+<pre><code>## Warning: Removed 6 rows containing missing values (position_stack).</code></pre>
+<pre><code>## Warning: Ignoring unknown aesthetics: data_id</code></pre>
+<pre><code>## Warning: Ignoring unknown aesthetics: tooltip, data_id, onclick</code></pre>
+<pre><code>## `geom_smooth()` using method = 'loess'</code></pre>
+<pre><code>## Warning: Removed 6 rows containing non-finite values (stat_smooth).</code></pre>
+<pre><code>## Warning: Removed 6 rows containing missing values (position_stack).</code></pre>
+<pre><code>## Warning: Ignoring unknown aesthetics: data_id</code></pre>
+<pre><code>## Warning: Ignoring unknown aesthetics: tooltip, data_id, onclick</code></pre>
+<pre><code>## `geom_smooth()` using method = 'loess'</code></pre>
+<pre><code>## Warning: Removed 6 rows containing non-finite values (stat_smooth).</code></pre>
+<pre><code>## Warning: Removed 6 rows containing missing values (position_stack).</code></pre>
+<pre><code>## Warning: Ignoring unknown aesthetics: data_id</code></pre>
+<pre><code>## Warning: Ignoring unknown aesthetics: tooltip, data_id, onclick</code></pre>
+<pre><code>## `geom_smooth()` using method = 'loess'</code></pre>
+<pre><code>## Warning: Removed 6 rows containing non-finite values (stat_smooth).</code></pre>
+<pre><code>## Warning: Removed 6 rows containing missing values (position_stack).</code></pre>
 </div>
 
 

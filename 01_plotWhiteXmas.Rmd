@@ -1,0 +1,174 @@
+---
+title: "Christmas snow"
+author: "Duc-Quang Nguyen | swissinfo.ch"
+date: "12-19-2016"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    theme: simplex
+---
+
+## ggiraph / SVG / font import
+
+**The interactive graphic with ggiraph under will have the font correctly imported. However, trying to display the non-interactive chart (ggplot2 non interactive) will throw an error because the font does not exist!!!**
+
+
+```{r setup, include=FALSE}
+data.file <- 'data/snow_day_1960_2016.txt'
+translation.file <- "input/White Xmas in ski resort - Sheet1.csv"
+
+library(readr)
+library(tidyr)
+library(dplyr)
+library(magrittr)
+library(countrycode)
+library(ggplot2)
+library(scales)
+library(swiMap)
+library(swiTheme)
+library(forcats)
+
+### Interactive 
+library(htmltools)
+library(ggiraph)
+library(swiRcharts)
+```
+
+
+```{r load & wrangle data}
+txt <- loadTranslation(translation.file)
+
+station <- data.frame(
+  id = c(41, 1, 63, 69),
+  name = c('Zermatt', 'Arosa', 'Adelboden', 'Engelberg'),
+  alt = c(1638, 1878, 1327, 1036),
+  link = c(
+    'https://en.wikipedia.org/wiki/Zermatt', 
+    'https://en.wikipedia.org/wiki/Arosa',
+    'https://en.wikipedia.org/wiki/Adelboden',
+    'https://en.wikipedia.org/wiki/Engelberg'),
+  pic_url = c(
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/1_zermatt_night_2012.jpg/320px-1_zermatt_night_2012.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Arosa_jun2_09_094.jpg/320px-Arosa_jun2_09_094.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Adelboden_schutzwald3.jpg/304px-Adelboden_schutzwald3.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Engelberg.jpg/251px-Engelberg.jpg' 
+  )
+)
+
+data.read <- read.table(data.file, sep = "" , header = T , skip = 12,
+                     na.strings ="", stringsAsFactors= F)
+
+# drop HH & MM columns
+data.read %<>% rename(snow = `X580`)
+
+data.read$STA <- factor(station$name[match(data.read$STA, station$id)], 
+                        levels = station$name[ order(station$alt)])
+
+data.read$date <- as.Date(paste0(data.read$JAHR, "-", data.read$MO, "-", data.read$TG ))
+
+data <- data.read %>% select(-HH, -MM)
+
+# cleaning
+data[which(data$snow == 32767), 'snow'] <- NA
+```
+
+```{r chart}
+lang <- 'EN'
+
+for(lang in colnames(txt)) {
+
+  dd <- data %>% filter(MO == 12, TG == 25, JAHR != 2016)
+  dd$alt <- paste0(station[match(dd$STA, station$name), 'alt'], txt['m.abb', lang])
+  
+  # create data.frame for xmas without snow
+  ddd <- dd %>% filter(snow == 0 | is.na(snow)) %>%
+    select(STA, JAHR, snow)
+  ddd$y <- -2.5
+  
+  ddl <- dd[!duplicated(dd$STA),]
+  ddl$label <- txt[as.character(ddl$STA), lang]
+  
+  ddl$tooltip <- paste0(
+    '<img src="', as.character(station[match(ddl$STA, station$name), 'pic_url']), '" alt="', as.character(ddl$STA), '" style="width:157px;">')
+  
+  ddl$onclick <- paste0(
+    'window.open("', as.character(station[match(ddl$STA, station$name), 'link']), '")'
+  )
+  
+  wc.pc <- dd %>% group_by(STA) %>% summarise(wc = sum(snow > 0, na.rm = T) / sum(!is.na(snow))) %>% ungroup()
+  ddl$wc <- round(wc.pc[match(ddl$STA, wc.pc$STA), 'wc'] * 100, 1)
+  
+  ddl$wc.lab <- paste0(txt['pc.wc', lang], ": ", unlist(ddl$wc))
+  
+  gp <- ggplot(data = dd, aes(JAHR, snow)) + 
+    geom_bar_interactive(aes(fill = STA, data_id = interaction(JAHR, STA)), stat = "identity") + 
+    geom_text_interactive(
+      data = ddl, 
+      aes(label = label, tooltip = tooltip, data_id = STA, onclick = onclick), 
+      x = 1992, y = 107, hjust = ifelse(lang == 'AR', 0.1, 1), vjust = 0, 
+      colour = "#f7f5ed", family = "Open Sans Condensed", 
+      size = as.numeric(txt['sta.fontsize', lang]), alpha = 0.9
+    ) +
+    geom_text(data = ddl, aes(label = alt), x = 2003, y = 107, hjust = 0, vjust = 0, 
+              colour = "#f7f5ed", family = "Open Sans Condensed", size = as.numeric(txt['sta.fontsize', lang]) / 2, alpha = 0.5) +
+    geom_smooth(se = F, colour = "#aa8959", alpha = 0.35) + 
+    facet_wrap( ~ STA, ncol = 2) + 
+    geom_point(
+      data = ddd %>% filter(snow == 0), aes(x = JAHR, y = y),  colour='#ab3d3f'
+    ) +
+    geom_point(
+      data = ddd %>% filter(is.na(snow)), aes(x = JAHR, y = y),  colour='#808080'
+    ) + 
+    swi_theme(base_size = 11, base_color = "#f2f2f2", base_family = "Open Sans Condensed") + 
+    scale_x_continuous(
+      name = "", breaks = scales::pretty_breaks(n = 6), 
+      expand = c(0,0), position = "top") + 
+    scale_y_continuous(name = txt['ylab', lang], expand = c(0,0), limits = c(-5, max(dd$snow, na.rm = T))) +
+    scale_fill_manual(values = swi_pal) + 
+    theme(
+      legend.position = "none", 
+      plot.background = element_rect(fill = "#333333", size = 0, color = NA),
+      panel.grid.major.y=element_line(color="#737373", linetype="dotted", size=0.09),
+      axis.title = element_text(colour = "#f7f5ed", size = 15),
+      axis.text = element_text(colour = "#e5dbcd"),
+      strip.background = element_blank(),
+      strip.text = element_blank(),
+      plot.margin=unit(c(0, 0.1, 0, 0.1), "cm")) 
+  
+  igp <- ggiraph(
+    width = 1,
+    height_svg = 6.6,
+    code = {print(gp)}, 
+    hover_css = "fill:#FF4C3B;cursor:pointer;",
+    tooltip_offx = -120,
+    tooltip_offy = 13,
+    fonts = list(sans = "Open Sans Condensed")
+  )
+  
+  source <- paste0(
+    txt['source', lang], ": ", 
+    htmlLink(txt['source.url', lang], txt['source.name', lang]), 
+    " | ", htmlLink("http://www.swissinfo.ch", 'swissinfo.ch')  )
+  
+  outfile <- paste0("xmas_snow_", lang, ".html")
+  save_html(
+    tags$html(
+      tags$head(includeHTML("styles.html")),
+      tags$body(    
+        h2(txt["main.title", lang]),
+        div(class = "descr", HTML(paste0(txt["descr", lang]))),
+        div(class="container", igp),
+        div(id = "cite", HTML(source)),
+        HTML(iframeresizer)  
+      )), file = outfile, libdir = "js", background = "#333333"
+  )  
+}
+
+
+
+
+
+  
+  
+```

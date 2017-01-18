@@ -1,0 +1,64 @@
+---
+title: "snow"
+author: "Duc-Quang Nguyen | swissinfo.ch"
+date: "12-19-2016"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    theme: simplex
+---
+
+## ggiraph / SVG / font import
+
+**The interactive graphic with ggiraph under will have the font correctly imported. However, trying to display the non-interactive chart (ggplot2 non interactive) will throw an error because the font does not exist!!!**
+
+
+```{r setup, include=FALSE}
+data.file <- 'data/snow_day_1960_2016.txt'
+translation.file <- "input/White Xmas in ski resort - Sheet1.csv"
+
+library(readr)
+library(tidyr)
+library(dplyr)
+library(magrittr)
+library(countrycode)
+library(ggplot2)
+library(scales)
+library(swiMap)
+library(swiTheme)
+library(forcats)
+
+### Interactive 
+library(htmltools)
+library(ggiraph)
+library(swiRcharts)
+```
+
+
+```{r load & wrangle data}
+txt <- loadTranslation(translation.file)
+
+data.read <- read.table(data.file, sep = "" , header = T , skip = 12,
+                     na.strings ="", stringsAsFactors= F)
+
+# drop HH & MM columns
+data.read %<>% rename(snow = `X580`) %>% filter(STA == 41) %>% 
+  select(-STA,-HH, -MM)
+
+data.read$date <- as.Date(paste0(data.read$JAHR, "-", data.read$MO, "-", data.read$TG ))
+data <- data.read
+
+# cleaning
+data[which(data$snow == 32767), 'snow'] <- NA
+```
+
+```{r chart}
+date.b <- seq(as.Date("1959-06-01"), as.Date("2016-06-01"), by="year")
+
+data$dbrk <- date.b[findInterval(data$date, date.b, all.inside = T)]
+```
+
+  
+  
+```

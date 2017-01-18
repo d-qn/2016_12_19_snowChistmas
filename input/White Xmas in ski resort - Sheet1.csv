@@ -1,9 +1,37 @@
- ,EN,FR,DE,IT,PT,AR,RU,ES,JA,ZH
-main.title,How much snow do Swiss ski resorts have on Christmas day?,,,,,,,,,
-descr,"The beige line is the smooth average of the snow coverage on Christmas days over time (red dots denote years where there was no snow on the 25th of December, grey dots indicate missing data). ",,,,,,,,,
-ylab,snow depth (cm),,,,,,,,,
-m.abb,m,,,,,,,,,
-source,Source,source,Quelle,Fonte,fonte,المصدر,Источник,Fuente,出典,来源
-source.name,MétéoSuisse,,,,,,,,,
-title.font,OpenSans-CondensedBold,OpenSans-CondensedBold,OpenSans-CondensedBold,OpenSans-CondensedBold,OpenSans-CondensedBold,OpenSans-CondensedBold,OpenSans-CondensedBold,OpenSans-CondensedBold,PingFang TC Regular,PingFang TC Regular
-base.font,Open Sans Condensed,Open Sans Condensed,Open Sans Condensed,Open Sans Condensed,Open Sans Condensed,Open Sans Condensed,Open Sans Condensed,Open Sans Condensed,PingFang TC Thin,PingFang TC Thin
+ code,EN,FR,DE,IT,PT,RU,ES,JA,ZH,AR
+main.title,How much snow do Swiss ski resorts have on Christmas day?,Hauteur de la couche de neige dans les stations de ski suisses à Noël ,Wie viel Schnee liegt in Schweizer Skigebieten an Weihnachten?,Quanta neve c'è nelle stazioni sciistiche svizzere il giorno di Natale?,Quanta neve as estações de esqui terão no Natal? ,Сколько снега на швейцарских лыжных курортах на Рождество и Новый год?,"
+
+¿Cuánta nieve hay en las estaciones suizas de esquí en Navidad? 
+
+
+
+",,瑞士各大滑雪胜地每年会迎来多少降雪？,ما هو حجم الثلوج التي ستكون متوفرة في محطات التزلج السويسرية يوم عيد الميلاد؟
+descr,"The beige line is the smooth average of the snow coverage on Christmas days over time (red dots denote years where there was no snow on the 25th of December, grey dots indicate missing data). ","La ligne beige indique l'évolution moyenne dans le temps de l'épaisseur de la couche de neige le jour de Noël (les points rouges représentent les 25 décembre sans neige, les points gris les données manquantes) ","Die beige Linie zeigt die durchschnittliche Schneemenge in der Zeit um Weihnachten (die roten Punkte stehen für einen 25. Dezember ohne Schnee, die grauen Punkte für fehlende Zahlen).","
+
+La linea marrone rappresenta l'innevamento medio nel giorno di Natale nel corso degli anni (i punti rossi indicano gli anni in
+cui il 25 dicembre non c’era neve; i punti grigi indicano i dati mancanti).
+
+",A linha bege é a média da cobertura de neve nos dias de Natal ao longo do tempo. O pontos vermelhos denotam anos onde não havia neve em 25 de dezembro. Os pontos cinzentos indicam falta de dados.,"
+
+Бежевая линия показывает среднюю высоту
+снежного покрова на Рождественские праздники (красным обозначены годы, когда на 25 декабря не было снега, серые
+указывают на отсутствующие данные). 
+
+","La línea beige indica la evolución temporal promedio de la capa de nieve el día de
+Navidad (los puntos rojos representan los 25 de diciembre sin nieve, los
+grises, la falta de datos)
+
+
+
+",,米黄色线条代表圣诞节期间积雪深度平均值(红点表示12月25日即圣诞节当日没有降雪；灰点特指缺少具体数据),يُشير الخط البُنّي الفاتح إلى متوسط التغيّر مع مرور الوقت في سمك طبقة الثلوج في يوم عيد الميلاد (النقاط الحمراء تمثل أيام 25 ديسمبر الخالية من الثلوج، أما النقاط الرمادية فتؤشر إلى المعطيات غير المتوفرة).
+ylab,snow depth (cm),épaisseur de neige (cm),Schneemenge (cm),spessore della neve (cm),camada de neve (centímetros),глубина снега (в см),capa de nieve (cm),,降雪深度(单位：厘米),snow depth (cm)
+Zermatt,Zermatt,Zermatt,Zermatt,Zermatt,Zermatt,Церматт,Zermatt,,采尔马特(Zermatt),Zermatt
+Arosa,Arosa,Arosa,Arosa,Arosa,Arosa,Ароза,Arosa,,阿罗萨(Arosa),Arosa
+Adelboden,Adelboden,Adelboden,Adelboden,Adelboden,Adelboden,Адельбоден,Adelboden,,阿德尔博登(Adelboden),Adelboden
+Engelberg,Engelberg,Engelberg,Engelberg,Engelberg,Engelberg,Энгельберг,Engelberg,,英格堡(Engelberg),Engelberg
+sta.fontsize,8,8,8,8,8,6,8,8,5,8
+m.abb,m,m,m,m,m.,м,m,,米,m
+source,Source,source,Quelle,Fonte,fonte,Источник,Fuente,出典,来源,المصدر
+source.name,MeteoSwiss,MétéoSuisse,MeteoSchweiz,Meteo Svizzera,Météo Suisse,Метеослужба Швейцарии,Météo Suisse,,瑞士联邦气候气象局,هيئة الأرصاد الجوية السويسرية 
+source.url,http://www.meteoswiss.admin.ch/home.html?tab=overview,http://www.meteoswiss.admin.ch/home.html?tab=overview,http://www.meteoswiss.admin.ch/home.html?tab=overview,http://www.meteoswiss.admin.ch/home.html?tab=overview,http://www.meteoswiss.admin.ch/home.html?tab=overview,http://www.meteoswiss.admin.ch/home.html?tab=overview,http://www.meteoswiss.admin.ch/home.html?tab=overview,http://www.meteoswiss.admin.ch/home.html?tab=overview,http://www.meteoswiss.admin.ch/home.html?tab=overview,http://www.meteoswiss.admin.ch/home.html?tab=overview
+base.font,Open Sans Condensed,Open Sans Condensed,Open Sans Condensed,Open Sans Condensed,Open Sans Condensed,Open Sans Condensed,Open Sans Condensed,PingFang TC Thin,PingFang TC Thin,Open Sans Condensed
